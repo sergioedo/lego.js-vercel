@@ -1,7 +1,7 @@
 import { checkUsuario } from '../../../../modules/usuarios'
 import { obtenerInsigniasUsuarios } from '../../../../modules/insignias'
 
-// API: Insignias de todos los usuarios
+// API: Insignias de un usuario
 export default async (req, res) => {
     try {
         const { usuario } = req.query
