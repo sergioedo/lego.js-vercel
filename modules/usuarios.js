@@ -31,3 +31,16 @@ export const getUsuarios = () => {
 
     return usuarios
 }
+
+export const checkUsuario = (usuario) => {
+    if (!usuario) {
+        return { error: true, text: 'Debe indicar un usuario' }
+    } else {
+        const usuarioEncontrado = getUsuarios().find(u => u === usuario)
+        if (usuarioEncontrado !== undefined) {
+            return { error: false }
+        } else {
+            return { error: true, text: 'El usuario no és valido' }
+        }
+    }
+}

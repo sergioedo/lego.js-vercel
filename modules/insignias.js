@@ -1,3 +1,5 @@
+import { obtenerDiarioUsuario } from './diarios'
+
 // https://stackoverflow.com/questions/3410464/how-to-find-indices-of-all-occurrences-of-one-string-in-another-in-javascript
 function getIndexesOf(searchStr, str, caseSensitive) {
     var searchStrLen = searchStr.length;
@@ -90,4 +92,21 @@ export function calcularInsigniasDiario(diarioMD) {
         }
     }
     return insignias
+}
+
+export const obtenerInsigniasUsuarios = (usuarios) => {
+    const commit = 'main'
+    const asyncInsignias = usuarios.map(usuario => {
+        return obtenerDiarioUsuario(usuario, commit)
+            .then(diarioMD => {
+                const humor = obtenerHumorDiario(diarioMD)
+                const insignias = calcularInsigniasDiario(diarioMD)
+                return { usuario, humor, insignias }
+            })
+    })
+    return Promise.all(asyncInsignias)
+        .then(insignias => {
+            const insigniasOrdenadas = insignias.sort((a, b) => (a.usuario.toLowerCase() > b.usuario.toLocaleLowerCase()) ? 1 : -1)
+            return insigniasOrdenadas
+        })
 }
