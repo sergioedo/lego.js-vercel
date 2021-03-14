@@ -1,7 +1,34 @@
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Head from 'next/head'
 import styles from 'github-markdown-css'
+import MarkdownIt from 'markdown-it'
+import { obtenerDiarioUsuario } from '../modules/diarios'
 
 export default function Diario() {
+  const router = useRouter()
+  const usuario = router.query.usuario
+  const commit = 'main'
+
+  const [diarioMD, setDiarioMD] = useState('')
+  const [diarioHTML, setDiarioHTML] = useState('')
+
+  useEffect(() => {
+    if (usuario) {
+      obtenerDiarioUsuario(usuario, commit)
+        .then(diarioMD => {
+          setDiarioMD(diarioMD)
+        })
+    }
+  }, [usuario, commit])
+
+  useEffect(() => {
+    const md = new MarkdownIt({
+      html: true
+    })
+    setDiarioHTML(md.render(diarioMD))
+  }, [diarioMD])
+
   return (
     <div>
       <Head>
@@ -12,14 +39,17 @@ export default function Diario() {
       <div className="markdown-body">
         <h1>Reto en pantuflas!</h1>
         <h2>Insignias obtenidas:</h2>
-        <div id={"humor"}>
-          <img id={'grinning'} src='https://img.shields.io/badge/%F0%9F%98%80-0-green.svg' />
-          <img id={'neutral_face'} src='https://img.shields.io/badge/%F0%9F%98%90-0-blue.svg' />
-          <img id={'frowning_face'} src='https://img.shields.io/badge/%F0%9F%98%95-0-red.svg' />
-        </div>
+        {usuario &&
+          <div id={"humor"}>
+            <img id={'grinning'} src={`/api/insignias/${usuario}/humor/grinning`} />
+            <img id={'grinning'} src={`/api/insignias/${usuario}/humor/neutral_face`} />
+            <img id={'grinning'} src={`/api/insignias/${usuario}/humor/frowning_face`} />
+          </div>
+        }
         <div id="insignias"></div>
       </div>
-      <main id="diario" className="markdown-body"></main>
+      <br />
+      <main id="diario" className="markdown-body" dangerouslySetInnerHTML={{ __html: diarioHTML }}></main>
     </div>
   )
 }
